@@ -146,14 +146,59 @@ export default function App() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiResponse, setAiResponse] = useState("");
 
+  // --- NEW: Load notes from Supabase on startup ---
+  useEffect(() => {
+    const fetchNotes = async () => {
+      const { data, error } = await supabase
+        .from('notes')
+        .select('*')
+        .order('id', { ascending: false });
+
+      if (!error && data) {
+        // Map database names (is_anon) back to your state names (isAnon)
+        const formattedData = data.map(n => ({
+          ...n,
+          isAnon: n.is_anon 
+        }));
+        setNotes(formattedData);
+        // Combine demo notes with real database notes for the public feed
+        const dbPublic = formattedData.filter(n => n.visibility === 'public');
+        setPublicNotes([...dbPublic, ...DEMO_NOTES]);
+      }
+    };
+
+    fetchNotes();
+  }, []);
+
   const createNewNote = () => {
     const note = { id: genId(), title: "", body: "", visibility: "private", isAnon: !user, author: user?.username || "anonymous", date: now() };
     setEditNote(note);
     setView("editor");
   };
 
-  const saveNote = () => {
+  // --- FIXED: Clean saveNote function ---
+  const saveNote = async () => {
     if (!editNote) return;
+
+    const noteData = {
+      id: editNote.id,
+      title: editNote.title,
+      body: editNote.body,
+      visibility: editNote.visibility,
+      is_anon: editNote.isAnon, 
+      author: editNote.author,
+    };
+
+    const { error } = await supabase
+      .from('notes')
+      .upsert(noteData);
+
+    if (error) {
+      console.error("Error saving to Supabase:", error.message);
+      alert("Failed to save: " + error.message);
+      return;
+    }
+
     const existing = notes.find(n => n.id === editNote.id);
     let updated;
     if (existing) {
@@ -161,7 +206,9 @@ export default function App() {
     } else {
       updated = [...notes, editNote];
     }
+    
     setNotes(updated);
+    
     if (editNote.visibility === "public") {
       const inPublic = publicNotes.find(n => n.id === editNote.id);
       if (inPublic) {
@@ -172,15 +219,27 @@ export default function App() {
     } else {
       setPublicNotes(publicNotes.filter(n => n.id !== editNote.id));
     }
+    
     setActiveNote(editNote);
+    alert("Saved to database!");
   };
 
-  const deleteNote = (id) => {
+const deleteNote = async (id) => {
+  const { error } = await supabase
+    .from('notes')
+    .delete()
+    .eq('id', id);
+
+  if (!error) {
     setNotes(notes.filter(n => n.id !== id));
     setPublicNotes(publicNotes.filter(n => n.id !== id));
     setEditNote(null);
     setActiveNote(null);
-  };
+  }
+};
+
+  // ... (Keep your existing handleAuth, handleShare, handleAI, etc. below this point)
+
 
   const handleAuth = () => {
     if (!authForm.username.trim()) return;
