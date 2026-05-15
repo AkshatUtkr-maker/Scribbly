@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-
+import { supabase } from "./supabase"; // Make sure the path matches your file name
 const FONT = "'DM Serif Display', serif";
 const MONO = "'DM Mono', monospace";
 
