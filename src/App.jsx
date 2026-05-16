@@ -220,7 +220,6 @@ export default function App() {
     if (authMode === "signup") {
       if (!authForm.username.trim()) {
         setAuthErr("Please choose a username.");
-        setAuthLoading(false);
         return;
       }
       const { error } = await supabase.auth.signUp({
