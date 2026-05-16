@@ -358,7 +358,7 @@ export default function App() {
         {/* NAV */}
         <nav className="nav">
           <div className="nav-logo" onClick={() => setView("home")}>
-            chitter <span>chatter</span>
+             <span>chatter</span>
           </div>
           <div className="nav-actions">
             <button className="btn btn-ghost" onClick={() => setView("feed")}>public feed</button>
@@ -381,7 +381,7 @@ export default function App() {
         {view === "home" && (
           <div className="hero">
             <h1>Say it out loud.<br /><em>Or don't.</em></h1>
-            <p>Chitter Chatter is your corner of the internet. Write publicly, stay anonymous, or keep it to yourself.</p>
+            <p>Scribbly is your corner of the internet. Write publicly, stay anonymous, or keep it to yourself.</p>
             <div className="hero-actions">
               <button className="btn btn-primary" onClick={createNewNote}>start writing →</button>
               <button className="btn btn-ghost" onClick={() => setView("feed")}>browse public notes</button>
@@ -568,7 +568,7 @@ export default function App() {
           <div className="modal-overlay" onClick={() => { setShowAuth(false); setAuthErr(""); }}>
             <div className="modal" onClick={e => e.stopPropagation()}>
               <h3>{authMode === "login" ? "Welcome back" : "Create account"}</h3>
-              <p>{authMode === "login" ? "Sign in to access your notes." : "Join Chitter Chatter — it's free."}</p>
+              <p>{authMode === "login" ? "Sign in to access your notes." : "Join  Chatter — it's free."}</p>
               {authErr && <div className="auth-error">{authErr}</div>}
               <div className="auth-form">
                 {authMode === "signup" && (
